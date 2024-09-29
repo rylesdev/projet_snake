@@ -13,6 +13,8 @@
 #define LEFT 75
 #define RIGHT 77
 
+#define MAX_FRUITS 3
+
 int length;
 int bend_no;
 int len;
@@ -288,11 +290,53 @@ void ExitGame()
         }
     }
 }
+coordinate fruit[MAX_FRUITS];
+int fruit_eaten[MAX_FRUITS];
+int fruit_gen_count = 0;
+int fruit_eaten_count = 0;
 void Food()
 {
-    if(head.x==food.x&&head.y==food.y)
+    if(fruit_gen_count < MAX_FRUITS) // si moins de 3 fruits générés
     {
-        length++;
+        for(int i = 0; i < MAX_FRUITS; i++)
+        {
+            fruit[i].x = rand()%70;
+            if(fruit[i].x <= 10)
+                fruit[i].x += 11;
+            fruit[i].y = rand()%30;
+            if(fruit[i].y <= 10)
+                fruit[i].y += 11;
+        }
+        fruit_gen_count = MAX_FRUITS; // incrémenter le compteur
+    }
+    else // si 3 fruits générés
+    {
+        for(int i = 0; i < MAX_FRUITS; i++)
+        {
+            if(head.x == fruit[i].x && head.y == fruit[i].y)
+            {
+                fruit_eaten[i] = 1; // marquer le fruit comme mangé
+                fruit_eaten_count++; // incrémenter le compteur de fruits mangés
+                if(fruit_eaten_count == MAX_FRUITS)
+                {
+                    length++; // incrémenter la longueur du serpent
+                    fruit_gen_count = 0; // réinitialiser le compteur
+                    fruit_eaten_count = 0; // réinitialiser le compteur de fruits mangés
+                    for(int j = 0; j < MAX_FRUITS; j++)
+                    {
+                        fruit[j].x = rand()%70;
+                        if(fruit[j].x <= 10)
+                            fruit[j].x += 11;
+                        fruit[j].y = rand()%30;
+                        if(fruit[j].y <= 10)
+                            fruit[j].y += 11;
+                        fruit_eaten[j] = 0; // initialiser l'état du fruit à non mangé
+                    }
+                }
+                break;
+            }
+        }
+    }
         time_t a;
         a=time(0);
         srand(a);
@@ -303,17 +347,11 @@ void Food()
         if(food.y<=10)
 
             food.y+=11;
-    }
-    else if(food.x==0)/*to create food for the first time coz global variable are initialized with 0*/
-    {
-        food.x=rand()%70;
-        if(food.x<=10)
-            food.x+=11;
-        food.y=rand()%30;
-        if(food.y<=10)
-            food.y+=11;
-    }
-}
+
+	}
+
+
+
 void Left()
 {
     int i;
@@ -428,7 +466,14 @@ void Boarder()
     system("cls");
     int i;
     GotoXY(food.x,food.y);   /*displaying food*/
-    printf("F");
+ 	for(int i = 0; i < MAX_FRUITS; i++)
+    {
+        if(!fruit_eaten[i]) // si le fruit n'est pas mangé
+        {
+            GotoXY(fruit[i].x, fruit[i].y);
+            printf("F");
+        }
+    }
     for(i=10; i<71; i++)
     {
         GotoXY(i,10);
