@@ -15,6 +15,7 @@
 
 #define MAX_FRUITS 3
 
+
 int length;
 int bend_no;
 int len;
@@ -81,122 +82,156 @@ int main()
     return 0;
 
 }
+coordinate fruit[MAX_FRUITS];
+int fruit_eaten[MAX_FRUITS];
+int fruit_gen_count = 0;
+int fruit_eaten_count = 0;
+void SaveGame()
+{
+    FILE *file = fopen("savegame.txt", "w");
+    if (file == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier de sauvegarde.\n");
+        return;
+    }
+
+    // Sauvegarder les données de la partie
+    fprintf(file, "%d\n", length);
+    fprintf(file, "%d\n", head.x);
+    fprintf(file, "%d\n", head.y);
+    fprintf(file, "%d\n", head.direction);
+    fprintf(file, "%d\n", bend_no);
+    for (int i = 0; i < bend_no; i++)
+    {
+        fprintf(file, "%d %d\n", bend[i].x, bend[i].y);
+    }
+    for (int i = 0; i < MAX_FRUITS; i++)
+    {
+        fprintf(file, "%d %d %d\n", fruit[i].x, fruit[i].y, fruit_eaten[i]);
+    }
+
+    fclose(file);
+    printf("Partie sauvegardée avec succès.\n");
+}
+
+void LoadGame()
+{
+    FILE *file = fopen("savegame.txt", "r");
+    if (file == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier de sauvegarde.\n");
+        return;
+    }
+
+    // Charger les données de la partie
+    fscanf(file, "%d\n", &length);
+    fscanf(file, "%d\n", &head.x);
+    fscanf(file, "%d\n", &head.y);
+    fscanf(file, "%d\n", &head.direction);
+    fscanf(file, "%d\n", &bend_no);
+    for (int i = 0; i < bend_no; i++)
+    {
+        fscanf(file, "%d %d\n", &bend[i].x, &bend[i].y);
+    }
+    for (int i = 0; i < MAX_FRUITS; i++)
+    {
+        fscanf(file, "%d %d %d\n", &fruit[i].x, &fruit[i].y, &fruit_eaten[i]);
+    }
+
+    fclose(file);
+    printf("Partie chargée avec succès.\n");
+}
+
 
 void Move()
 {
-    int a,i;
+    int a, i;
 
     do
     {
-
         Food();
         fflush(stdin);
 
-        len=0;
+        len = 0;
 
-        for(i=0; i<30; i++)
-
+        for (i = 0; i < 30; i++)
         {
-
-            body[i].x=0;
-
-            body[i].y=0;
-
-            if(i==length)
-
+            body[i].x = 0;
+            body[i].y = 0;
+            if (i == length)
                 break;
-
         }
 
         Delay(length);
 
         Boarder();
 
-        if(head.direction==RIGHT)
-
+        if (head.direction == RIGHT)
             Right();
-
-        else if(head.direction==LEFT)
-
+        else if (head.direction == LEFT)
             Left();
-
-        else if(head.direction==DOWN)
-
+        else if (head.direction == DOWN)
             Down();
-
-        else if(head.direction==UP)
-
+        else if (head.direction == UP)
             Up();
 
         ExitGame();
 
     }
-    while(!kbhit());
+    while (!kbhit());
 
-    a=getch();
-
-    if(a==27)
-
+    if (kbhit())
     {
+        key = getch();
 
-        system("cls");
+        if (key == 27)
+        {
+            system("cls");
+            exit(0);
+        }
+        else if (key == 'S' || key == 's')
+        {
+            SaveGame();
+            // Continuer à exécuter le programme
+            Move();
+        }
+        else if (key == 'L' || key == 'l')
+        {
+            LoadGame();
+            // Continuer à exécuter le programme
+            Move();
+        }
+        else if ((key == RIGHT && head.direction != LEFT && head.direction != RIGHT) ||
+                 (key == LEFT && head.direction != RIGHT && head.direction != LEFT) ||
+                 (key == UP && head.direction != DOWN && head.direction != UP) ||
+                 (key == DOWN && head.direction != UP && head.direction != DOWN))
+        {
+            bend_no++;
+            bend[bend_no] = head;
+            head.direction = key;
 
-        exit(0);
+            if (key == UP)
+                head.y--;
+            if (key == DOWN)
+                head.y++;
+            if (key == RIGHT)
+                head.x++;
+            if (key == LEFT)
+                head.x--;
 
+            Move();
+        }
+        else
+        {
+            printf("\a");
+            Move();
+        }
     }
-    key=getch();
-
-    if((key==RIGHT&&head.direction!=LEFT&&head.direction!=RIGHT)||(key==LEFT&&head.direction!=RIGHT&&head.direction!=LEFT)||(key==UP&&head.direction!=DOWN&&head.direction!=UP)||(key==DOWN&&head.direction!=UP&&head.direction!=DOWN))
-
-    {
-
-        bend_no++;
-
-        bend[bend_no]=head;
-
-        head.direction=key;
-
-        if(key==UP)
-
-            head.y--;
-
-        if(key==DOWN)
-
-            head.y++;
-
-        if(key==RIGHT)
-
-            head.x++;
-
-        if(key==LEFT)
-
-            head.x--;
-
-        Move();
-
-    }
-
-    else if(key==27)
-
-    {
-
-        system("cls");
-
-        exit(0);
-
-    }
-
     else
-
     {
-
-        printf("\a");
-
         Move();
-
     }
 }
-
 void gotoxy(int x, int y)
 {
 
@@ -290,10 +325,7 @@ void ExitGame()
         }
     }
 }
-coordinate fruit[MAX_FRUITS];
-int fruit_eaten[MAX_FRUITS];
-int fruit_gen_count = 0;
-int fruit_eaten_count = 0;
+
 void Food()
 {
     if(fruit_gen_count < MAX_FRUITS) // si moins de 3 fruits générés
@@ -489,6 +521,7 @@ void Boarder()
         printf("!");
     }
 }
+
 void Print()
 {
     //GotoXY(10,12);
@@ -569,6 +602,7 @@ int Scoreonly()
     system("cls");
     return score;
 }
+
 void Up()
 {
     int i;
