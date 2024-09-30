@@ -52,10 +52,9 @@ coordinate head, bend[500],food,body[30];
 
 int main()
 {
-
     char key;
 
-    Print();
+    Menu();
 
     system("cls");
 
@@ -75,8 +74,7 @@ int main()
 
     life=3; //number of extra lives
 
-    bend[0]=head;
-    
+    bend[0]=head;    
 
     Move();   //initialing initial bend coordinate
 
@@ -88,8 +86,8 @@ void Menu()
 {
     int choix, delay;
 
-    printf("Bienvenue dans le jeu de Snake !\n");
-    printf("Veuillez sélectionner la vitesse de jeu :\n");
+    printf("\nBienvenue dans le jeu de Snake !\n");
+    printf("Veuillez selectionner la vitesse de jeu :\n");
     printf("1. Mode lent\n");
     printf("2. Mode rapide\n");
     printf("Entrez votre choix : ");
@@ -105,6 +103,8 @@ void Menu()
         // Mode rapide
         delay = 10; // ajustez la valeur de delay pour obtenir la vitesse désirée
     }
+    else if(getch()==27)
+        exit(0);
     else
     {
         printf("Choix invalide. Veuillez réessayer.\n");
@@ -183,6 +183,7 @@ void Move()
     	
         Food();
         fflush(stdin);
+
 
         len = 0;
 
@@ -530,6 +531,7 @@ void Bend()
 }
 void Boarder()
 {
+	
     system("cls");
     int i;
     GotoXY(food.x,food.y);   /*displaying food*/
@@ -543,6 +545,7 @@ void Boarder()
     }
     for(i=10; i<71; i++)
     {
+    	Score();
         GotoXY(i,10);
         printf("!");
         GotoXY(i,30);
@@ -556,7 +559,7 @@ void Boarder()
         printf("!");
     }
 }
-
+/*
 void Print()
 {
     //GotoXY(10,12);
@@ -566,10 +569,9 @@ void Print()
     printf("\tGame instructions:\n");
     printf("\n-> Use arrow keys to move the snake.\n\n-> You will be provided foods at the several coordinates of the screen which you have to eat. Everytime you eat a food the length of the snake will be increased by 1 element and thus the score.\n\n-> Here you are provided with three lives. Your life will decrease as you hit the wall or snake's body.\n\n-> YOu can pause the game in its middle by pressing any key. To continue the paused game press any other key once again\n\n-> If you want to exit press esc. \n");
     printf("\n\nPress any key to play game...");
-    Menu();
     if(getch()==27)
         exit(0);
-}
+}*/
 void record()
 {
     char plname[20],nplname[20],cha,c;
